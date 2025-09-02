@@ -18,7 +18,7 @@ async def trigger_prediction(job_id: str, model_id: str, webhook_url: str, predi
         )
 
         # Prediction başarılı, registry güncelle
-        update_registry(job_id, f"{prediction_id_name}", prediction.id)
+        update_registry(job_id, prediction_id_name, prediction.id)
 
     except Exception as e:
         print(f"[trigger_prediction] Unexpected error for job_id: {job_id}, error: {e}")
