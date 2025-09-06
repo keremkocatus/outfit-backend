@@ -1,6 +1,15 @@
 from db.client import get_supabase_client
 from registery.registery import get_job_by_id
 
+async def insert_to_db(table: str, data: dict):
+    try:
+        supabase = await get_supabase_client()
+        response = await supabase.from_(table).insert(data).execute()
+
+        {"status": "Data successfully inserted into database", "response": response}
+    except Exception as error:
+        print(f"Error in insert_to_db: {error}")
+
 
 async def insert_job_record(job_id: str, table_name: str, insert_keys: list[str]) -> dict | None:
     """

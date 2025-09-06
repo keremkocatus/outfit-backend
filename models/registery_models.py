@@ -18,8 +18,8 @@ def create_wardrobe_record(
         "image_url": image_url,
         "category": category,
         "is_long_top": is_long_top,
-        "rembg_url": None,
-        "enhance_url": None,
+        "removed_bg_image_url": None,
+        "enhanced_image_url": None,
     }
 
     return record

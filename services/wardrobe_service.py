@@ -6,11 +6,13 @@ from db.upload_image import upload_image
 from models.prediction_models import build_enhance_prediction_input, build_rembg_prediction_input
 from registery.registery import get_job_by_prediction_id, register_job, update_registry
 from models.registery_models import create_wardrobe_record
-from services.background_service import start_enhance_background_process
+from services.background_service import start_enhance_background_process, start_rembg_background_process
+from services.caption_service import process_caption_for_job
 from services.replicate_service import trigger_prediction
 from utils.extrack_utils import extract_id
+from services.error_service import mark_job_failed   
 
-
+# Wardrobe enhance and rembg process
 async def process_wardrobe_image(
     user_id: str,
     clothe_image: UploadFile,
@@ -18,6 +20,7 @@ async def process_wardrobe_image(
     is_long_top: bool,
     is_enhance: bool,
 ):
+    job_id = None 
     try:
         # Upload işlemi (supabase)
         bucket = config.WARDROBE_BUCKET_NAME
@@ -31,8 +34,8 @@ async def process_wardrobe_image(
 
         # DB'ye başlangıç kaydını ekle
         resp = await insert_job_record(
-            job_id=job_id, 
-            table_name=config.WARDROBE_TABLE_NAME, 
+            job_id=job_id,
+            table_name=config.WARDROBE_TABLE_NAME,
             insert_keys=[
                 "image_url",
                 "user_id",
@@ -50,12 +53,16 @@ async def process_wardrobe_image(
         if is_enhance:
             loop.create_task(trigger_prediction(
                 job_id,
-                model_id=config.ENHANCE_MODEL_ID, 
-                webhook_url=routes.WEBHOOK_ENHANCE, 
-                prediction_input=build_enhance_prediction_input(category, job["image_url"]), 
-                prediction_id_name="enhance_prediction_id")
-                )
+                model_id=config.ENHANCE_MODEL_ID,
+                webhook_url=routes.WEBHOOK_ENHANCE,
+                prediction_input=build_enhance_prediction_input(category, job["image_url"]),
+                prediction_id_name="enhance_prediction_id"
+            ))
         else:
+            # Start Caption
+            loop.create_task(process_caption_for_job(job))
+
+            # Start Rembg
             loop.create_task(trigger_prediction(
                 job_id,
                 model_id=config.REMBG_MODEL_ID,
@@ -64,10 +71,15 @@ async def process_wardrobe_image(
                 prediction_id_name="rembg_prediction_id"
             ))
 
-        # Servis sonucu dönüyor
         return {"job_id": job_id}
 
     except Exception as e:
+        if job_id:
+            await mark_job_failed(
+                job_id=job_id,
+                table_name=config.WARDROBE_TABLE_NAME,
+                failed_fields=["enhance_status", "rembg_status", "caption_status"]
+            )
         raise HTTPException(status_code=500, detail=f"Error in wardrobe process: {e}")
 
 
@@ -84,7 +96,10 @@ async def handle_enhance_webhook(payload: dict) -> None:
             await start_enhance_background_process(payload, job_id, job)
 
             loop = asyncio.get_running_loop()
-
+            # Start Caption
+            loop.create_task(process_caption_for_job(job))
+            
+            # Start Rembg
             loop.create_task(trigger_prediction(
                 job_id,
                 model_id=config.REMBG_MODEL_ID,
@@ -95,8 +110,28 @@ async def handle_enhance_webhook(payload: dict) -> None:
 
             return job_id, job
         else:
-            await mark_job_failed(job_id)
+            prediction_id = payload.get("id")
+            job_id, _ = get_job_by_prediction_id(prediction_id, "enhance_prediction_id")
+            if job_id:
+                await mark_job_failed(job_id, config.WARDROBE_TABLE_NAME, ["enhance_status"])
     except Exception as e:
         if job_id:
-            await mark_job_failed(job_id)
-        raise HTTPException(status_code=500, detail=f"Webhook processing failed: {e}")
+            await mark_job_failed(job_id, config.WARDROBE_TABLE_NAME, ["enhance_status"])
+        raise HTTPException(status_code=500, detail=f"Webhook processing failed enhance: {e}")
+    
+
+# Handle webhook event for fast prediction completion
+async def handle_rembg_webhook(payload: dict):
+    job_id = None
+    try:
+        prediction_id = payload["id"]
+        job_id, job = get_job_by_prediction_id(prediction_id, "rembg_prediction_id")
+
+        loop = asyncio.get_running_loop()
+        loop.create_task(start_rembg_background_process(payload, job_id, job))
+
+        return job_id
+    except Exception as e:
+        if job_id:
+            await mark_job_failed(job_id, config.WARDROBE_TABLE_NAME, ["rembg_status"])
+        raise HTTPException(status_code=500, detail=f"Webhook processing failed rembg: {e}")
