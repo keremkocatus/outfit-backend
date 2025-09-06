@@ -1,6 +1,6 @@
 from fastapi import APIRouter, File, Form, Request, UploadFile, HTTPException
 import core.routes as routes
-from services.wardrobe_service import process_wardrobe_image
+from services.wardrobe_service import handle_enhance_webhook, process_wardrobe_image
 
 wardrobe_router = APIRouter()
 
