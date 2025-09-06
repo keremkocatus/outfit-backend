@@ -18,6 +18,13 @@ def get_job_id_by_job(job: dict):
             return jid
     raise ValueError("No job found matching the provided job dict")
 
+def get_job_by_prediction_id(prediction_id: str, prediction_name: str) -> tuple[str, dict]:
+    for job_id, job in JOB_REGISTRY.items():
+        if job.get(prediction_name) == prediction_id:
+            return job_id, job
+
+    raise ValueError(f"No job found with prediction ID: {prediction_id}")
+
 def update_registry(job_id: str, key: str, new_value):
     job = JOB_REGISTRY.get(job_id)
     if not job:

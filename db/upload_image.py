@@ -4,11 +4,14 @@ from db.client import get_supabase_client
 from utils.db_utils import build_storage_path, extract_public_url
 
 
-async def upload_image(user_id: str, bucket: str, file_name: str, image_file: UploadFile) -> tuple[str, str] | None:
+async def upload_image(user_id: str, bucket: str, bucket_id: str | None, file_name: str, image_file: UploadFile) -> tuple[str, str] | None:
     try:
         supabase = await get_supabase_client()
         image_data = await image_file.read()
-        bucket_id = str(uuid.uuid4())
+
+        if bucket_id is None:
+            bucket_id = str(uuid.uuid4())
+            
         storage_path = build_storage_path(user_id, bucket_id, f"{file_name}.jpg")
 
         await supabase.storage.from_(bucket).upload(
