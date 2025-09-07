@@ -12,7 +12,7 @@ def create_wardrobe_record(
         "caption_status": "processing",
         "enhance_prediction_id": None,
         "rembg_prediction_id": None,
-        "wardrobe_id": None,
+        "wardrobe_item_id": None,
         "user_id": user_id,
         "bucket_id": bucket_id,
         "image_url": image_url,

@@ -12,7 +12,7 @@ async def start_enhance_background_process(prediction: dict, job_id: str, job: d
         result_url, _ = await upload_image(job["user_id"], config.WARDROBE_BUCKET_NAME, job["bucket_id"],"enhanced.png", img)
         
         update_registry(job_id, "enhance_status", "finished")
-        update_registry(job_id, "enhance_url", result_url)
+        update_registry(job_id, "enhanced_image_url", result_url)
 
         update_data = {
             "enhanced_image_url": result_url,
@@ -24,15 +24,14 @@ async def start_enhance_background_process(prediction: dict, job_id: str, job: d
         return {"status": 200, "response": resp}
     except Exception as error:
         print(f"Error in start_enhance_background_process for job {job_id}: {error}")
-        raise
 
 async def start_rembg_background_process(prediction: dict, job_id: str, job: dict[str, str]):
     try:
         img = await run_in_threadpool(get_image_from_url,prediction["output"])
-        result_url = await  upload_image(job["user_id"], config.WARDROBE_BUCKET_NAME, job["bucket_id"], "rembg.png", img)
+        result_url, _ = await  upload_image(job["user_id"], config.WARDROBE_BUCKET_NAME, job["bucket_id"], "rembg.png", img)
 
         update_registry(job_id, "rembg_status", "finished")
-        update_registry(job_id, "rembg_url", result_url)
+        update_registry(job_id, "removed_bg_image_url", result_url)
 
         update_data = {
             "removed_bg_image_url": result_url,

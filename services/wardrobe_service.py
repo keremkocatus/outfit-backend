@@ -46,7 +46,7 @@ async def process_wardrobe_image(
                 "rembg_status"
             ])
         
-        update_registry(job_id, "wardrobe_id", extract_id(resp["response"].data))
+        update_registry(job_id, "wardrobe_item_id", extract_id(resp["response"].data))
 
         # Enhance veya Rembg tetikleme
         loop = asyncio.get_running_loop()
@@ -54,7 +54,7 @@ async def process_wardrobe_image(
             loop.create_task(trigger_prediction(
                 job_id,
                 model_id=config.ENHANCE_MODEL_ID,
-                webhook_url=routes.WEBHOOK_ENHANCE,
+                webhook_url=f"{routes.APP_URL}{routes.WEBHOOK_ENHANCE}",
                 prediction_input=build_enhance_prediction_input(category, job["image_url"]),
                 prediction_id_name="enhance_prediction_id"
             ))
@@ -66,12 +66,12 @@ async def process_wardrobe_image(
             loop.create_task(trigger_prediction(
                 job_id,
                 model_id=config.REMBG_MODEL_ID,
-                webhook_url=routes.WEBHOOK_FAST_REMBG,
+                webhook_url=f"{routes.APP_URL}{routes.WEBHOOK_FAST_REMBG}",
                 prediction_input=build_rembg_prediction_input(job["image_url"]),
                 prediction_id_name="rembg_prediction_id"
             ))
 
-        return {"job_id": job_id}
+        return job_id
 
     except Exception as e:
         if job_id:
@@ -103,8 +103,8 @@ async def handle_enhance_webhook(payload: dict) -> None:
             loop.create_task(trigger_prediction(
                 job_id,
                 model_id=config.REMBG_MODEL_ID,
-                webhook_url=routes.WEBHOOK_FAST_REMBG,
-                prediction_input=build_rembg_prediction_input(job["image_url"]),
+                webhook_url=f"{routes.APP_URL}{routes.WEBHOOK_FAST_REMBG}",
+                prediction_input=build_rembg_prediction_input(job["enhanced_image_url"]),
                 prediction_id_name="rembg_prediction_id"
             ))
 

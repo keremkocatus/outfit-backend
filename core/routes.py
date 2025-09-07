@@ -1,6 +1,9 @@
 
+# Dev Ortam Url'i
+APP_URL = "https://918d90aa9a13.ngrok-free.app"
+
 # Test Ortam Url'i
-APP_URL = "https://outfit-test-python.up.railway.app"
+#APP_URL = "https://outfit-test-python.up.railway.app"
 
 # Canlı Ortam Url'i
 #APP_URL = "https://outfit-prod-python.up.railway.app"
@@ -8,7 +11,7 @@ APP_URL = "https://outfit-test-python.up.railway.app"
 
 # Endpoints
 WARDROBE_PROCESS = "/wardrobe/process"
-WARDROBE_JOB_STATUS = "/wardrobe/job-status/{job_id}/{is_enhance}"
+WARDROBE_JOB_STATUS = "/wardrobe/job-status/{job_id}"
 
 LATE_ENHANCE = "/replicate/late-enhance"
 LATE_ENHANCE_JOB_STATUS = "/late-enhance/job-status/{job_id}/{is_enhance}"

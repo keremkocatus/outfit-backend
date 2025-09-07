@@ -23,9 +23,9 @@ async def process_caption_for_job(job: dict) -> dict | str:
 
         # 2. Save to clothes detail table
         await insert_clothes_detail(
-            wardrobe_id=job["wardrobe_id"],
+            wardrobe_item_id=job["wardrobe_item_id"],
             user_id=job["user_id"],
-            caption=caption_data
+            caption_data=caption_data
         )
 
         # 3. Update registry
@@ -42,7 +42,6 @@ async def process_caption_for_job(job: dict) -> dict | str:
 
     except Exception as e:
         print(f"[Caption Service] Error: {e}")
-        return "Error generating caption"
 
 
 async def insert_clothes_detail(wardrobe_item_id: str, user_id: str, caption_data: dict) -> dict:
