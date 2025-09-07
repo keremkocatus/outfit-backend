@@ -1,5 +1,7 @@
 import uuid
 
+from fastapi import HTTPException
+
 JOB_REGISTRY: dict[str, dict] = {}
 
 # Register a new background-removal job and return its identifier
@@ -35,3 +37,34 @@ def update_registry(job_id: str, key: str, new_value):
 
     job[key] = new_value
 
+def get_job_status(job_id: str, status_names: list[str], result_key: str):
+    job = JOB_REGISTRY.get(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} bulunamadı")
+
+    # Job bitti mi? (Tüm status alanları "finished" mi?)
+    if all(job.get(status) == "finished" for status in status_names):
+        result_url = job.get(result_key)
+        del JOB_REGISTRY[job_id]
+
+        return {
+            "job_id": job_id,
+            "status": "finished",
+            "result_url": result_url,
+        }
+
+    # Job fail oldu mu? (Herhangi bir status alanı "failed" ise)
+    if any(job.get(status) == "failed" for status in status_names):
+        # DB'den son halini almak istiyorsan buraya get_job_by_id(job_id) eklenebilir
+        del JOB_REGISTRY[job_id]
+
+        return {
+            "job_id": job_id,
+            "status": "failed",
+        }
+
+    # Aksi halde iş devam ediyor
+    return {
+        "job_id": job_id,
+        "status": "processing"
+    }

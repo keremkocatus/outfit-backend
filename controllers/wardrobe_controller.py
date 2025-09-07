@@ -1,6 +1,8 @@
 from fastapi import APIRouter, File, Form, Request, UploadFile, HTTPException
 import core.routes as routes
-from services.wardrobe_service import handle_enhance_webhook, process_wardrobe_image
+from registery.registery import get_job_status
+from services.error_service import mark_job_failed
+from services.wardrobe_service import handle_enhance_webhook, handle_rembg_webhook, process_wardrobe_image
 
 wardrobe_router = APIRouter()
 
@@ -45,14 +47,11 @@ async def replicate_enhance_webhook(request: Request):
         status = payload.get("status")
 
         if status == "succeeded":
-            job_id, job = await handle_enhance_webhook(payload)
-
-            loop = asyncio.get_running_loop()
-            loop.create_task(chain_remove_background(job_id))
+            _, _ = await handle_enhance_webhook(payload)
 
             return {"status": "Enhance webhook received successfully, and rembg started"}
         else:
-            await mark_job_failed(job_id)
+            pass
 
             return {"status": "failed"}
     except HTTPException:
@@ -63,10 +62,30 @@ async def replicate_enhance_webhook(request: Request):
             detail=f"Error processing enhance webhook: {e}"
         )
 
-@wardrobe_router.get(routes.WARDROBE_JOB_STATUS)
-async def fetch_job_status(job_id: str, is_enhance: bool):
+@wardrobe_router.post(routes.WEBHOOK_FAST_REMBG)
+async def replicate_fast_webhook(request: Request):
     try:
-        return get_job_status(job_id, is_enhance)
+        payload = await request.json()
+        status = payload.get("status")
+
+        if status == "succeeded":
+            _ = await handle_rembg_webhook(payload)
+            
+            return {"status": "Webhook rembg received successfully"}
+        else:
+            pass
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error processing fast webhook: {e}"
+        )
+        
+@wardrobe_router.get(routes.WARDROBE_JOB_STATUS)
+async def fetch_job_status(job_id: str):
+    try:
+        return get_job_status(job_id, ["enhance_status", "rembg_status", "caption_status"], "removed_bg_image_url")
     except HTTPException:
         raise
     except Exception as e:
