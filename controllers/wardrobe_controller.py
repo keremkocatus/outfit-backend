@@ -1,7 +1,6 @@
 from fastapi import APIRouter, File, Form, Request, UploadFile, HTTPException
 import core.routes as routes
 from registery.registery import get_job_status
-from services.error_service import mark_job_failed
 from services.wardrobe_service import handle_enhance_webhook, handle_rembg_webhook, process_wardrobe_image
 
 wardrobe_router = APIRouter()
@@ -9,7 +8,8 @@ wardrobe_router = APIRouter()
 @wardrobe_router.post(routes.WARDROBE_PROCESS)
 async def wardrobe_process(
     user_id: str = Form(...),
-    clothe_image: UploadFile = File(...),
+    clothe_image: UploadFile = File(None),
+    clothe_image_url: str = Form(None),
     category: str = Form(...),
     is_long_top: bool = Form(False),
     is_enhance: bool = Form(False),
@@ -25,6 +25,7 @@ async def wardrobe_process(
         job_id = await process_wardrobe_image(
             user_id=user_id,
             clothe_image=clothe_image,
+            clothe_image_url=clothe_image_url,
             category=category,
             is_long_top=is_long_top,
             is_enhance=is_enhance,
@@ -34,7 +35,7 @@ async def wardrobe_process(
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Error in chain process: {e}"
+            detail=f"Error in wardrobe controller: {e}"
         )
 
 @wardrobe_router.post(routes.WEBHOOK_ENHANCE)
