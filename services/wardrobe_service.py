@@ -13,26 +13,21 @@ from utils.extrack_utils import extract_id
 from services.error_service import mark_job_failed   
 import uuid
 
+
 # Wardrobe enhance and rembg process
 async def process_wardrobe_image(
     user_id: str,
-    clothe_image: UploadFile | None,
-    clothe_image_url: str | None,
+    clothe_image: UploadFile,
     category: str,
     is_long_top: bool,
     is_enhance: bool,
 ):
     job_id = None 
     try:
-        if clothe_image:
-            # Upload işlemi (supabase)
-            bucket = config.WARDROBE_BUCKET_NAME
-            file_name = f"{category}.jpg"
+        bucket = config.WARDROBE_BUCKET_NAME
+        file_name = f"{category}.jpg"
 
-            public_url, bucket_id = await upload_image(user_id, bucket, None, file_name, clothe_image)
-        else:
-            public_url = clothe_image_url
-            bucket_id = str(uuid.uuid4())
+        public_url, bucket_id = await upload_image(user_id, bucket, None, file_name, clothe_image)
 
         # Job kaydı
         job = create_wardrobe_record(public_url, user_id, bucket_id, category, is_long_top)

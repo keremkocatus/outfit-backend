@@ -16,7 +16,7 @@ SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
 # Model ID's
 REMBG_MODEL_ID = "a029dff38972b5fda4ec5d75d7d1cd25aeff621d2cf4946a41055d7db66b80bc"
-ENHANCE_MODEL_ID = "black-forest-labs/flux-kontext-pro"
+ENHANCE_MODEL_ID = "google/nano-banana"
 
 # Tables & Buckets
 WARDROBE_BUCKET_NAME = "deneme"

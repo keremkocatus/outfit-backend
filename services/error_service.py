@@ -1,5 +1,5 @@
 from db.update import update_in_db
-from registery.registery import update_registry
+from registery.registery import get_job_by_prediction_id, update_registry
 
 async def mark_job_failed(
     job_id: str,
@@ -25,3 +25,9 @@ async def mark_job_failed(
 
     # Supabase tablosunda update et
     resp = await update_in_db(table_name, update_data, "job_id", job_id)
+
+async def prediction_failed(payload: dict, table_name: str, prediction_id_name: str, failed_fileds: list[str]):
+    prediction_id = payload.get("id")
+    job_id, _ = get_job_by_prediction_id(prediction_id, prediction_id_name)
+
+    await mark_job_failed(job_id, table_name, failed_fileds)

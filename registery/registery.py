@@ -40,7 +40,7 @@ def update_registry(job_id: str, key: str, new_value):
 def get_job_status(job_id: str, status_names: list[str], result_key: str):
     job = JOB_REGISTRY.get(job_id)
     if not job:
-        raise HTTPException(status_code=404, detail=f"Job {job_id} bulunamadı")
+        raise HTTPException(status_code=404, detail=f"Job_id: {job_id} bulunamadı")
 
     # Job bitti mi? (Tüm status alanları "finished" mi?)
     if all(job.get(status) == "finished" for status in status_names):

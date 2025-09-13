@@ -1,6 +1,9 @@
+from typing import List
 from fastapi import APIRouter, File, Form, Request, UploadFile, HTTPException
+from core import config
 import core.routes as routes
 from registery.registery import get_job_status
+from services.error_service import prediction_failed
 from services.wardrobe_service import handle_enhance_webhook, handle_rembg_webhook, process_wardrobe_image
 
 wardrobe_router = APIRouter()
@@ -8,8 +11,7 @@ wardrobe_router = APIRouter()
 @wardrobe_router.post(routes.WARDROBE_PROCESS)
 async def wardrobe_process(
     user_id: str = Form(...),
-    clothe_image: UploadFile = File(None),
-    clothe_image_url: str = Form(None),
+    clothe_images: List[UploadFile] = File(...),   # birden fazla dosya
     category: str = Form(...),
     is_long_top: bool = Form(False),
     is_enhance: bool = Form(False),
@@ -22,16 +24,24 @@ async def wardrobe_process(
        Aksi halde direkt rembg.
     """
     try:
-        job_id = await process_wardrobe_image(
-            user_id=user_id,
-            clothe_image=clothe_image,
-            clothe_image_url=clothe_image_url,
-            category=category,
-            is_long_top=is_long_top,
-            is_enhance=is_enhance,
-        )
+        job_ids = []
 
-        return {"job_id": job_id}
+        # UploadFile listesi üzerinden dön
+        if clothe_images:
+            for image in clothe_images:
+                job_id = await process_wardrobe_image(
+                    user_id=user_id,
+                    clothe_image=image,
+                    category=category,
+                    is_long_top=is_long_top,
+                    is_enhance=is_enhance,
+                )
+                job_ids.append(job_id)
+        else:
+            return {"status": "There is no image!"}
+
+        return {"job_ids": job_ids}
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -52,9 +62,7 @@ async def replicate_enhance_webhook(request: Request):
 
             return {"status": "Enhance webhook received successfully, and rembg started"}
         else:
-            pass
-
-            return {"status": "failed"}
+            await prediction_failed(payload, config.WARDROBE_TABLE_NAME, "enhance_prediction_id", ["enhance_status"])
     except HTTPException:
         raise
     except Exception as e:
@@ -74,7 +82,7 @@ async def replicate_fast_webhook(request: Request):
             
             return {"status": "Webhook rembg received successfully"}
         else:
-            pass
+            await prediction_failed(payload, config.WARDROBE_TABLE_NAME, "rembg_prediction_id", ["rembg_status"])
     except HTTPException:
         raise
     except Exception as e:
