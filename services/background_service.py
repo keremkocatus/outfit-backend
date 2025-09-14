@@ -6,40 +6,48 @@ from utils.image_utils import get_image_from_url
 from core import config
 
 
-async def start_enhance_background_process(prediction: dict, job_id: str, job: dict[str, str]):
+async def start_background_process(
+    prediction: dict,
+    job_id: str,
+    job: dict[str, str],
+    file_name: str,
+    status_field: str,
+    url_field: str,
+    status_value: str,
+    bucket_name: str,
+    table_name: str
+):
     try:
-        img = await run_in_threadpool(get_image_from_url,prediction["output"])
-        result_url, _ = await upload_image(job["user_id"], config.WARDROBE_BUCKET_NAME, job["bucket_id"],"enhanced.png", img)
-        
-        update_registry(job_id, "enhance_status", "finished")
-        update_registry(job_id, "enhanced_image_url", result_url)
+        # resmi indir
+        img = await run_in_threadpool(get_image_from_url, prediction["output"])
 
+        # upload et
+        result_url, _ = await upload_image(
+            job["user_id"],
+            bucket_name,
+            job["bucket_id"],
+            file_name,
+            img
+        )
+
+        # registry güncelle
+        update_registry(job_id, status_field, status_value)
+        update_registry(job_id, url_field, result_url)
+
+        # DB güncelle
         update_data = {
-            "enhanced_image_url": result_url,
-            "enhance_status": "finished"
+            url_field: result_url,
+            status_field: status_value
         }
-
-        resp = await update_in_db(config.WARDROBE_TABLE_NAME, update_data, "image_url", job["image_url"])
+        resp = await update_in_db(
+            table_name,
+            update_data,
+            "image_url",
+            job["image_url"]
+        )
 
         return {"status": 200, "response": resp}
+
     except Exception as error:
-        print(f"Error in start_enhance_background_process for job {job_id}: {error}")
-
-async def start_rembg_background_process(prediction: dict, job_id: str, job: dict[str, str]):
-    try:
-        img = await run_in_threadpool(get_image_from_url,prediction["output"])
-        result_url, _ = await  upload_image(job["user_id"], config.WARDROBE_BUCKET_NAME, job["bucket_id"], "rembg.png", img)
-
-        update_registry(job_id, "rembg_status", "finished")
-        update_registry(job_id, "removed_bg_image_url", result_url)
-
-        update_data = {
-            "removed_bg_image_url": result_url,
-            "rembg_status": "finished"
-        }
-
-        resp = await update_in_db(config.WARDROBE_TABLE_NAME, update_data, "image_url", job["image_url"])
-
-        return {"status": 200, "response": resp}
-    except Exception as error:
-        print(f"Error in start_fast_background_process for job {job_id}: {error}")
+        print(f"Error in start_background_process for job {job_id}: {error}")
+        return {"status": 500, "error": str(error)}

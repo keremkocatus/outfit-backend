@@ -23,3 +23,21 @@ def create_wardrobe_record(
     }
 
     return record
+
+def create_edit_record(
+    image_url: str,
+    user_id: str,
+    bucket_id: str,
+    prompt: str
+):
+    record = {
+        "status": "processing",
+        "prediction_id": None,
+        "user_id": user_id,
+        "bucket_id": bucket_id,
+        "image_url": image_url,
+        "prompt": prompt,
+        "edited_image_url": None,
+    }
+
+    return record

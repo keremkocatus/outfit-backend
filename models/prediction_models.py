@@ -15,3 +15,10 @@ def build_rembg_prediction_input(image_url: str) -> dict:
         "threshold": -20,
         "background_type": "rgba",
     }
+
+def build_edit_prediction_input(prompt: str, image_url: str) -> dict:
+    return {
+        "prompt": prompt,
+        "image_input": [image_url],
+        "output_format": "jpg",
+    }

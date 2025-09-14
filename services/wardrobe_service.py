@@ -6,12 +6,11 @@ from db.upload_image import upload_image
 from models.prediction_models import build_enhance_prediction_input, build_rembg_prediction_input
 from registery.registery import get_job_by_prediction_id, register_job, update_registry
 from models.registery_models import create_wardrobe_record
-from services.background_service import start_enhance_background_process, start_rembg_background_process
+from services.background_service import start_background_process
 from services.caption_service import process_caption_for_job
 from services.replicate_service import trigger_prediction
 from utils.extrack_utils import extract_id
 from services.error_service import mark_job_failed   
-import uuid
 
 
 # Wardrobe enhance and rembg process
@@ -94,7 +93,15 @@ async def handle_enhance_webhook(payload: dict) -> None:
             prediction_id = payload.get("id")
             job_id, job = get_job_by_prediction_id(prediction_id, "enhance_prediction_id")
 
-            await start_enhance_background_process(payload, job_id, job)
+            await start_background_process(
+                payload, job_id, job,
+                file_name="enhanced.png",
+                status_field="enhance_status",
+                url_field="enhanced_image_url",
+                status_value="finished",
+                bucket_name=config.WARDROBE_BUCKET_NAME,
+                table_name=config.WARDROBE_TABLE_NAME
+            )
 
             loop = asyncio.get_running_loop()
             # Start Caption
@@ -129,7 +136,15 @@ async def handle_rembg_webhook(payload: dict):
         job_id, job = get_job_by_prediction_id(prediction_id, "rembg_prediction_id")
 
         loop = asyncio.get_running_loop()
-        loop.create_task(start_rembg_background_process(payload, job_id, job))
+        loop.create_task(start_background_process(
+                            payload, job_id, job,
+                            file_name="rembg.png",
+                            status_field="rembg_status",
+                            url_field="removed_bg_image_url",
+                            status_value="finished",
+                            bucket_name=config.WARDROBE_BUCKET_NAME,
+                            table_name=config.WARDROBE_TABLE_NAME
+                        ))
 
         return job_id
     except Exception as e:

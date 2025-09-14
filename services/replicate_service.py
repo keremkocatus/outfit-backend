@@ -1,9 +1,7 @@
 import replicate
-from fastapi import HTTPException
-
 from core import config
-from registery.registery import get_job_by_id, update_registry
-from utils.prompt_utils import get_enhance_prompt
+from registery.registery import update_registry
+
 
 replicate_client = replicate.Client(api_token=config.REPLICATE_API_KEY)
 
