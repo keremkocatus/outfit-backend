@@ -3,7 +3,6 @@ from db.update import update_in_db
 from db.upload_image import upload_image
 from registery.registery import update_registry
 from utils.image_utils import get_image_from_url
-from core import config
 
 
 async def start_background_process(
@@ -30,10 +29,6 @@ async def start_background_process(
             img
         )
 
-        # registry güncelle
-        update_registry(job_id, status_field, status_value)
-        update_registry(job_id, url_field, result_url)
-
         # DB güncelle
         update_data = {
             url_field: result_url,
@@ -45,9 +40,14 @@ async def start_background_process(
             "image_url",
             job["image_url"]
         )
+        
+        # registry güncelle
+        update_registry(job_id, status_field, status_value)
+        update_registry(job_id, url_field, result_url)
 
         return {"status": 200, "response": resp}
 
     except Exception as error:
         print(f"Error in start_background_process for job {job_id}: {error}")
         return {"status": 500, "error": str(error)}
+

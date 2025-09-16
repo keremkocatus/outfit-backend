@@ -41,3 +41,21 @@ def create_edit_record(
     }
 
     return record
+
+def create_review_record(
+    image_url: str,
+    user_id: str,
+    bucket_id: str,
+    roast_level: str
+):
+    record = {
+        "status": "processing",
+        "prediction_id": None,
+        "user_id": user_id,
+        "bucket_id": bucket_id,
+        "image_url": image_url,
+        "roast_level": roast_level,
+        "result": None,
+    }
+
+    return record

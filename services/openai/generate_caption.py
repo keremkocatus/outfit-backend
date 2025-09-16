@@ -1,11 +1,6 @@
-from openai import AsyncOpenAI
 from services.openai.completion_service import run_tool_completion
 from utils.caption_tools.caption_process_utils import clean_ai_context, clean_brief_caption
 from utils.caption_tools.caption_utils import get_caption_message, get_caption_tool_schema
-from core import config
-
-# Initialize OpenAI client
-client = AsyncOpenAI(api_key=config.OPENAI_API_KEY)
 
 # ---- Caption generation via OpenAI tool call ----
 async def generate_structured_caption(image_url: str) -> dict | None:
