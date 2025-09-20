@@ -15,7 +15,7 @@ def get_enhance_prompt(category: str) -> str:
         return "Extract the pair of shoes from the image in their original shape and view. Preserve the clothing exactly as it is. Remove background and body parts."
 
     elif category == "accessories":
-        return "Extract the accessory (bag, belt, hat, glasses, jewelry) from the image. Preserve the clothing exactly as it is. Remove background and body parts."
+        return "Extract the bag, belt, hat, glasses, jewelry from the image. Preserve the clothing exactly as it is. Remove background and body parts."
 
     else:
         return "Extract the clothing item from the image without changing its shape or size. Preserve the clothing exactly as it is. Remove background and human body parts."
