@@ -22,7 +22,7 @@ EDIT_MODEL_ID = "google/nano-banana"
 # Tables & Buckets
 WARDROBE_BUCKET_NAME = "deneme"
 WARDROBE_TABLE_NAME = "wardrobe"
-CLOTHES_DETAIL_TABLE = "cloth_detail"
+CLOTHES_DETAIL_TABLE = "clothes_detail"
 
 ERROR_LOG_TABLE = "error_log"
 
