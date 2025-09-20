@@ -1,9 +1,9 @@
 
 # Dev Ortam Url'i
-APP_URL = "https://8f972d9f2963.ngrok-free.app"
+#APP_URL = "https://8f972d9f2963.ngrok-free.app"
 
 # Test Ortam Url'i
-#APP_URL = "https://outfit-test-python.up.railway.app"
+APP_URL = "https://outfit-test-python.up.railway.app"
 
 # Canlı Ortam Url'i
 #APP_URL = "https://outfit-prod-python.up.railway.app"
