@@ -30,3 +30,24 @@ def extract_bucket_id(image_url: str) -> str:
         return match.group(1)
     else:
         raise ValueError("Bucket ID (UUID) not found in the URL.")
+    
+def table_name(name: str, schema: str) -> str:
+    """
+    Eğer schema 'prod' ise tablo adı aynı kalır.
+    Eğer schema 'test' ise:
+      - prefix (ai_, core_, comm_, feat_ vs.) kaldırılır
+      - 'test_' ile başlatılır
+    """
+    if schema == "prod":
+        return name
+
+    if schema == "test":
+        if "_" in name:
+            # ilk '_' işaretinden sonrasını al
+            base = name.split("_", 1)[1]
+        else:
+            base = name
+        return f"test_{base}"
+
+    # fallback (başka schema gelirse olduğu gibi dönsün)
+    return name
