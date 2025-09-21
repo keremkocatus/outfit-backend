@@ -53,7 +53,7 @@ async def process_tryon(
         loop.create_task(trigger_fashn(
             job_id,
             input_json=build_tryon_prediction_input(config.TRY_ON_MODEL_ID, job["photo_url"], job["clothing_url"], False),
-            fashn_url=routes.WEBHOOK_TRY_ON,
+            fashn_url=f"{config.FASHN_URL}?webhook_url={routes.APP_URL}{routes.WEBHOOK_TRY_ON}",
             prediction_id_name="ai_job_id"
         ))
 
@@ -73,6 +73,8 @@ async def handle_tryon_webhook(payload: dict) -> None:
             job_id, job = get_job_by_prediction_id(prediction_id, "ai_job_id")
 
             await start_background_process(payload, job_id, job, "try-on.jpg", "status", "result_url", "finished", config.TRY_ON_BUCKET ,config.TRY_ON_TABLE)
+
+            return {"status": 200}
         else:
             await prediction_failed(payload, config.TRY_ON_TABLE, "ai_job_id", ["status"])
     except Exception as e:

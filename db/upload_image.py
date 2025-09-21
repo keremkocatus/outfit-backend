@@ -30,3 +30,4 @@ async def upload_image(user_id: str, bucket: str, bucket_id: str | None, file_na
         return public_url, bucket_id
     except Exception as error:
         print(f"Error in upload_image: {error}")
+        return None, None

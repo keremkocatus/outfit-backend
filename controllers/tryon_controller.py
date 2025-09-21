@@ -38,7 +38,7 @@ async def replicate_enhance_webhook(request: Request):
     """
     try:
         payload = await request.json()
-        _, _ = await handle_tryon_webhook(payload)
+        _ = await handle_tryon_webhook(payload)
 
         return {"status": "Try on webhook received successfully."}
     except Exception as e:

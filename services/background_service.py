@@ -21,7 +21,7 @@ async def start_background_process(
 ):
     try:
         # resmi indir
-        if prediction["output"] is list:
+        if isinstance(prediction["output"], list):
             img = await run_in_threadpool(get_image_from_url, prediction["output"][0])
         else:
             img = await run_in_threadpool(get_image_from_url, prediction["output"])
@@ -43,8 +43,8 @@ async def start_background_process(
         resp = await update_in_db(
             table_name,
             update_data,
-            "image_url",
-            job["image_url"]
+            "job_id",
+            job_id
         )
         
         # registry güncelle
@@ -54,7 +54,7 @@ async def start_background_process(
         return {"status": 200, "response": resp}
 
     except Exception as e:
-        await mark_job_failed(job_id, config.EDIT_TABLE_NAME, [status_field])
+        await mark_job_failed(job_id, table_name, [status_field])
         raise HTTPException(status_code=500, detail=f"Error in background process: {e}")
 
 
