@@ -59,3 +59,25 @@ def create_review_record(
     }
 
     return record
+
+def create_tryon_record(
+    model_image: str,
+    garment_image: str,
+    user_id: str,
+    category: str,
+    is_long_top: bool,
+    bucket_id: str,
+):
+    record = {
+        "status": "processing",
+        "ai_job_id": None,
+        "user_id": user_id,
+        "bucket_id": bucket_id,
+        "photo_url": model_image,
+        "clothing_url": garment_image,
+        "clothing_type": category,
+        "is_long_top": is_long_top,
+        "result_url": None
+    }
+
+    return record

@@ -1,5 +1,4 @@
 import uuid
-
 from fastapi import HTTPException
 
 JOB_REGISTRY: dict[str, dict] = {}

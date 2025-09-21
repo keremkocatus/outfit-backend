@@ -22,3 +22,13 @@ def build_edit_prediction_input(prompt: str, image_url: str) -> dict:
         "image_input": [image_url],
         "output_format": "jpg",
     }
+
+def build_tryon_prediction_input(model_name: str, model_url: str, garment_url: str, segmentation_free: bool = False) -> dict:
+    return {
+            "model_name": model_name, 
+            "inputs": {
+            "model_image": model_url,
+            "garment_image": garment_url,
+            "segmentation_free": segmentation_free
+            }
+        }
