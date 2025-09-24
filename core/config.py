@@ -5,6 +5,9 @@ from utils.db_utils import table_name
 # Load environment variables
 load_dotenv()
 
+# APP URL
+APP_URL = os.getenv("APP_URL")
+
 # API Keys
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 REPLICATE_API_KEY = os.getenv("REPLICATE_API_TOKEN")

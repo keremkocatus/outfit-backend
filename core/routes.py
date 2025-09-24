@@ -1,13 +1,4 @@
 
-# Dev Ortam Url'i
-APP_URL = "https://7bf4b84aac55.ngrok-free.app"
-
-# Test Ortam Url'i
-#APP_URL = "https://outfit-test-python.up.railway.app"
-
-# Canlı Ortam Url'i
-#APP_URL = "https://outfit-prod-python.up.railway.app"
-
 # Endpoints
 WARDROBE_PROCESS = "/wardrobe/process"
 WARDROBE_JOB_STATUS = "/wardrobe/job-status/{job_id}"

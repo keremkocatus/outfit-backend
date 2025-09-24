@@ -41,7 +41,6 @@ async def process_tryon(
             insert_keys=[
                 "photo_url",
                 "user_id",
-                "ai_job_id",
                 "status",
                 "clothing_url",
                 "clothing_type",
@@ -53,7 +52,7 @@ async def process_tryon(
         loop.create_task(trigger_fashn(
             job_id,
             input_json=build_tryon_prediction_input(config.TRY_ON_MODEL_ID, job["photo_url"], job["clothing_url"], False),
-            fashn_url=f"{config.FASHN_URL}?webhook_url={routes.APP_URL}{routes.WEBHOOK_TRY_ON}",
+            fashn_url=f"{config.FASHN_URL}?webhook_url={config.APP_URL}{routes.WEBHOOK_TRY_ON}",
             prediction_id_name="ai_job_id"
         ))
 

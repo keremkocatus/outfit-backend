@@ -3,7 +3,6 @@ from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 from core import config
 import core.routes as routes
 from registery.registery import get_job_status
-from services.error_service import prediction_failed
 from services.tryon_service import handle_tryon_webhook, process_tryon
 
 try_on_router = APIRouter()

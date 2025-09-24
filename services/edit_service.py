@@ -45,7 +45,7 @@ async def process_edit_image(
         loop.create_task(trigger_prediction(
             job_id,
             model_id=config.EDIT_MODEL_ID,
-            webhook_url=f"{routes.APP_URL}{routes.WEBHOOK_IMAGE_EDIT}",
+            webhook_url=f"{config.APP_URL}{routes.WEBHOOK_IMAGE_EDIT}",
             prediction_input=build_edit_prediction_input(prompt, job["image_url"]),
             prediction_id_name="prediction_id"
         ))
