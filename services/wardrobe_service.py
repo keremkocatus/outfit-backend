@@ -6,33 +6,27 @@ from db.upload_image import upload_image
 from models.prediction_models import build_enhance_prediction_input, build_rembg_prediction_input
 from registery.registery import get_job_by_prediction_id, register_job, update_registry
 from models.registery_models import create_wardrobe_record
-from services.background_service import start_enhance_background_process, start_rembg_background_process
+from services.background_service import start_background_process
 from services.caption_service import process_caption_for_job
 from services.replicate_service import trigger_prediction
 from utils.extrack_utils import extract_id
 from services.error_service import mark_job_failed   
-import uuid
+
 
 # Wardrobe enhance and rembg process
 async def process_wardrobe_image(
     user_id: str,
-    clothe_image: UploadFile | None,
-    clothe_image_url: str | None,
+    clothe_image: UploadFile,
     category: str,
     is_long_top: bool,
     is_enhance: bool,
 ):
     job_id = None 
     try:
-        if clothe_image:
-            # Upload işlemi (supabase)
-            bucket = config.WARDROBE_BUCKET_NAME
-            file_name = f"{category}.jpg"
+        bucket = config.WARDROBE_BUCKET_NAME
+        file_name = f"{category}.jpg"
 
-            public_url, bucket_id = await upload_image(user_id, bucket, None, file_name, clothe_image)
-        else:
-            public_url = clothe_image_url
-            bucket_id = str(uuid.uuid4())
+        public_url, bucket_id = await upload_image(user_id, bucket, None, file_name, clothe_image)
 
         # Job kaydı
         job = create_wardrobe_record(public_url, user_id, bucket_id, category, is_long_top)
@@ -60,7 +54,7 @@ async def process_wardrobe_image(
             loop.create_task(trigger_prediction(
                 job_id,
                 model_id=config.ENHANCE_MODEL_ID,
-                webhook_url=f"{routes.APP_URL}{routes.WEBHOOK_ENHANCE}",
+                webhook_url=f"{config.APP_URL}{routes.WEBHOOK_ENHANCE}",
                 prediction_input=build_enhance_prediction_input(category, job["image_url"]),
                 prediction_id_name="enhance_prediction_id"
             ))
@@ -72,7 +66,7 @@ async def process_wardrobe_image(
             loop.create_task(trigger_prediction(
                 job_id,
                 model_id=config.REMBG_MODEL_ID,
-                webhook_url=f"{routes.APP_URL}{routes.WEBHOOK_FAST_REMBG}",
+                webhook_url=f"{config.APP_URL}{routes.WEBHOOK_FAST_REMBG}",
                 prediction_input=build_rembg_prediction_input(job["image_url"]),
                 prediction_id_name="rembg_prediction_id"
             ))
@@ -99,7 +93,15 @@ async def handle_enhance_webhook(payload: dict) -> None:
             prediction_id = payload.get("id")
             job_id, job = get_job_by_prediction_id(prediction_id, "enhance_prediction_id")
 
-            await start_enhance_background_process(payload, job_id, job)
+            await start_background_process(
+                payload, job_id, job,
+                file_name="enhanced.png",
+                status_field="enhance_status",
+                url_field="enhanced_image_url",
+                status_value="finished",
+                bucket_name=config.WARDROBE_BUCKET_NAME,
+                table_name=config.WARDROBE_TABLE_NAME
+            )
 
             loop = asyncio.get_running_loop()
             # Start Caption
@@ -109,7 +111,7 @@ async def handle_enhance_webhook(payload: dict) -> None:
             loop.create_task(trigger_prediction(
                 job_id,
                 model_id=config.REMBG_MODEL_ID,
-                webhook_url=f"{routes.APP_URL}{routes.WEBHOOK_FAST_REMBG}",
+                webhook_url=f"{config.APP_URL}{routes.WEBHOOK_FAST_REMBG}",
                 prediction_input=build_rembg_prediction_input(job["enhanced_image_url"]),
                 prediction_id_name="rembg_prediction_id"
             ))
@@ -134,7 +136,15 @@ async def handle_rembg_webhook(payload: dict):
         job_id, job = get_job_by_prediction_id(prediction_id, "rembg_prediction_id")
 
         loop = asyncio.get_running_loop()
-        loop.create_task(start_rembg_background_process(payload, job_id, job))
+        loop.create_task(start_background_process(
+                            payload, job_id, job,
+                            file_name="rembg.png",
+                            status_field="rembg_status",
+                            url_field="removed_bg_image_url",
+                            status_value="finished",
+                            bucket_name=config.WARDROBE_BUCKET_NAME,
+                            table_name=config.WARDROBE_TABLE_NAME
+                        ))
 
         return job_id
     except Exception as e:

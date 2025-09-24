@@ -23,3 +23,61 @@ def create_wardrobe_record(
     }
 
     return record
+
+def create_edit_record(
+    image_url: str,
+    user_id: str,
+    bucket_id: str,
+    prompt: str
+):
+    record = {
+        "status": "processing",
+        "prediction_id": None,
+        "user_id": user_id,
+        "bucket_id": bucket_id,
+        "image_url": image_url,
+        "prompt": prompt,
+        "edited_image_url": None,
+    }
+
+    return record
+
+def create_review_record(
+    image_url: str,
+    user_id: str,
+    bucket_id: str,
+    roast_level: str
+):
+    record = {
+        "status": "processing",
+        "prediction_id": None,
+        "user_id": user_id,
+        "bucket_id": bucket_id,
+        "image_url": image_url,
+        "roast_level": roast_level,
+        "result": None,
+    }
+
+    return record
+
+def create_tryon_record(
+    model_image: str,
+    garment_image: str,
+    user_id: str,
+    category: str,
+    is_long_top: bool,
+    bucket_id: str,
+):
+    record = {
+        "status": "processing",
+        "ai_job_id": None,
+        "user_id": user_id,
+        "bucket_id": bucket_id,
+        "photo_url": model_image,
+        "clothing_url": garment_image,
+        "clothing_type": category,
+        "is_long_top": is_long_top,
+        "result_url": None
+    }
+
+    return record
