@@ -15,6 +15,8 @@ REVIEW_JOB_STATUS = "/review/job-status/{job_id}"
 TRY_ON = "/fashn/try-on"
 TRY_ON_JOB_STATUS = "/fashn/job-status/{job_id}"
 
+OUTFIT_PROCESS = "/outfit/process"
+
 # Webhooks
 WEBHOOK_FAST_REMBG = "/webhook/replicate/fast-rembg"
 WEBHOOK_ENHANCE = "/webhook/replicate-enhance"
