@@ -1,8 +1,6 @@
-from fastapi import APIRouter, File, Form, Request, UploadFile, HTTPException
-from core import config
+from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 import core.routes as routes
 from registery.registery import get_job_status
-from services.error_service import prediction_failed
 from services.review_service import process_review_image
 
 review_router = APIRouter()
