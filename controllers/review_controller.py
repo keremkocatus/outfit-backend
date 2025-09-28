@@ -7,7 +7,7 @@ from services.review_service import process_review_image
 
 review_router = APIRouter()
 
-@review_router.post(routes.IMAGE_EDIT)
+@review_router.post(routes.REVIEW_OUTFIT)
 async def review_process(
     user_id: str = Form(...),
     image: UploadFile = File(...),   
