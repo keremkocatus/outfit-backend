@@ -1,1 +1,22 @@
+# Python cache dosyaları
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Cpython versiyonlu pyc dosyaları
+*cpython-*.pyc
+
+# Virtualenv klasörleri
 .env
+.env/
+.venv/
+env/
+venv/
+
+# IDE dosyaları
+.vscode/
+.idea/
+
+# MacOS
+.DS_Store
