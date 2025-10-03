@@ -1,30 +1,30 @@
 
 
-def get_outfit_review_prompt(image_url: str, roast_level: int) -> list:
+def get_outfit_review_prompt(image_url: str, roast_level: str) -> list:
     """
     Returns OpenAI chat messages for outfit review, customized by roast_level (1 to 5).
     """
-    if roast_level == 1:
+    if roast_level == "1":
         tone_instruction = (
             "You're a friendly fashion coach. Be extremely gentle and encouraging. "
             "Avoid criticism. Focus on what's working and give only the softest suggestions."
         )
-    elif roast_level == 2:
+    elif roast_level == "2":
         tone_instruction = (
             "You're a kind fashion stylist. Be mostly positive, mention a few areas to improve, "
             "but keep the tone supportive and polite."
         )
-    elif roast_level == 3:
+    elif roast_level == "3":
         tone_instruction = (
             "You're a balanced fashion expert. Give fair, objective feedback. "
             "Mention strengths and weaknesses equally. Be honest but respectful."
         )
-    elif roast_level == 4:
+    elif roast_level == "4":
         tone_instruction = (
             "You're a bold fashion critic. Lean into sharp feedback and don't sugarcoat. "
             "Still be fair and don't roast too hard — just keep it real."
         )
-    elif roast_level == 5:
+    elif roast_level == "5":
         tone_instruction = (
             "You're a savage fashion roaster. Be brutally honest, sarcastic, and funny. "
             "Point out flaws dramatically. Your job is to roast this outfit mercilessly — but still include structured ratings."

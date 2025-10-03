@@ -1,17 +1,15 @@
-from fastapi import APIRouter, File, Form, Request, UploadFile, HTTPException
-from core import config
+from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 import core.routes as routes
 from registery.registery import get_job_status
-from services.error_service import prediction_failed
 from services.review_service import process_review_image
 
 review_router = APIRouter()
 
-@review_router.post(routes.IMAGE_EDIT)
+@review_router.post(routes.REVIEW_OUTFIT)
 async def review_process(
     user_id: str = Form(...),
     image: UploadFile = File(...),   
-    roast_level: int = Form(...)
+    roast_level: str = Form(...)
 ):
     try:
         job_id = await process_review_image(
