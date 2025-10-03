@@ -55,7 +55,7 @@ def get_image_from_url(url: str):
         img = Image.open(BytesIO(resp.content))
 
         buf = BytesIO()
-        img.save(buf, format="PNG", quality=90, optimize=True)
+        img.save(buf, format="PNG", quality=95, optimize=True)
 
         return buf.getvalue()
     except Exception as e:

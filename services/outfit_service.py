@@ -40,7 +40,7 @@ async def process_outfit(user_id: str, outfit_ids: list[str], image_urls: list[s
             # Batch stack → (N,224,224,3)
             batch_input = np.vstack(batch_imgs)
 
-            # Feature extraction (N,1280)
+            # Feature extraction 
             batch_embeddings = await run_in_threadpool(extract_embedding, batch_input)
 
             # Insert DB
