@@ -9,7 +9,7 @@ review_router = APIRouter()
 async def review_process(
     user_id: str = Form(...),
     image: UploadFile = File(...),   
-    roast_level: int = Form(...)
+    roast_level: str = Form(...)
 ):
     try:
         job_id = await process_review_image(

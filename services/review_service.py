@@ -14,7 +14,7 @@ from services.error_service import mark_job_failed
 async def process_review_image(
     user_id: str,
     image: UploadFile,
-    roast_level: int,
+    roast_level: str,
 ):
     job_id = None 
     try:
@@ -61,7 +61,7 @@ async def process_review_image(
 async def start_review_generation(
     job_id: str,
     image_url: str,
-    roast_level: int
+    roast_level: str
 ): 
     try:
         review_result = await generate_review(image_url, roast_level)

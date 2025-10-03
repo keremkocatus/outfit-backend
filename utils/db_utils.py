@@ -51,3 +51,37 @@ def table_name(name: str, schema: str) -> str:
 
     # fallback (başka schema gelirse olduğu gibi dönsün)
     return name
+
+async def check_outfits_missing(outfit_ids: list[str], image_urls: list[str], supabase) -> list[tuple[str, str]]:
+    """
+    Verilen outfit_id ve image_url listelerini kontrol eder.
+    comm_vector_store'da olmayanları (missing) outfit_id ↔ image_url eşleşmiş halde döner.
+
+    Args:
+        outfit_ids (list[str]): outfit_id listesi
+        image_urls (list[str]): image_url listesi (aynı sırada)
+
+    Returns:
+        list[tuple[str, str]]: işleme girecek (outfit_id, image_url) çiftleri
+    """
+    response = await supabase.rpc(
+        "check_outfits_exist",
+        {"outfit_ids": outfit_ids}
+    ).execute()
+
+    if not response.data:
+        return list(zip(outfit_ids, image_urls))  # hiçbiri yoksa hepsi işlenecek
+
+    # DB'de olmayanları al
+    missing_ids = {row["outfit_id"] for row in response.data if not row["is_exist"]}
+
+    # outfit_id ↔ image_url eşleştirmesi
+    filtered = [
+        (o_id, url)
+        for o_id, url in zip(outfit_ids, image_urls)
+        if o_id in missing_ids
+    ]
+
+    return filtered
+
+
