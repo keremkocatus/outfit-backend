@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Form, HTTPException
+from fastapi import APIRouter, Form, HTTPException, Request
 import core.routes as routes
-from services.outfit_service import process_outfit
+from services.outfit_service import handle_outfit_webhook, process_outfit
 from typing import List
 
 outfit_router = APIRouter()
@@ -24,3 +24,11 @@ async def outfit_process(
             status_code=500,
             detail=f"Error in outfit controller: {e}"
         )
+        
+@outfit_router.post(routes.WEBHOOK_OUTFIT)
+async def outfit_webhook(request: Request):
+    payload = await request.json()
+    
+    await handle_outfit_webhook(payload)
+    
+    return {"status": 200}
