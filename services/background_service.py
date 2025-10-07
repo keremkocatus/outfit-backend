@@ -1,6 +1,5 @@
 from fastapi import HTTPException
 from fastapi.concurrency import run_in_threadpool
-from core import config
 from db.update import update_in_db
 from db.upload_image import upload_image
 from registery.registery import update_registry

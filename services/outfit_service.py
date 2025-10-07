@@ -61,3 +61,42 @@ async def process_outfit(user_id: str, outfit_ids: list[str], image_urls: list[s
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error in outfit service: {e}")
+
+
+async def handle_outfit_webhook(payload: dict):
+    try:
+        # Event tipi kontrolü
+        event_type = payload.get("type")
+        if event_type != "INSERT":
+            return {"status": "ignored", "reason": f"Event type {event_type} is not handled"}
+
+        # Record çek
+        record = payload.get("record")
+        if not record:
+            return {"status": "error", "reason": "Missing record in payload"}
+
+        # Alanları çıkar
+        user_id = record.get("user_id")
+        outfit_id = record.get("id")
+        image_url = record.get("image_url")
+
+        if not (user_id and outfit_id and image_url):
+            return {"status": "error", "reason": "Missing required fields in record"}
+
+        # Tekil değerleri listeye çevir
+        outfit_ids = [outfit_id]
+        image_urls = [image_url]
+
+        # process_outfit çağrısı
+        result = await process_outfit(
+            user_id=user_id,
+            outfit_ids=outfit_ids,
+            image_urls=image_urls
+        )
+
+        return {"status": "success", "processed": result}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error in handle_outfit_webhook: {e}")
+
+    
