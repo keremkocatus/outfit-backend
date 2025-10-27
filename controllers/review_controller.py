@@ -14,7 +14,10 @@ async def review_process(
 ):
     try:
         if not await check_token(user_id=user_id, required_token_count=1):
-            return {"status": "failed", "detail": "Token not enough."}
+            raise HTTPException(
+                status_code=402,
+                detail={"Token not enough."}
+            )
         
         job_id = await process_review_image(
             user_id=user_id,
