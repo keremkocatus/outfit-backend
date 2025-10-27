@@ -1,78 +1,22 @@
-# ---- Python Temel ----
+# Python cache dosyaları
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyo
+*.pyd
 
-# ---- Ortam Dosyaları ----
+# Cpython versiyonlu pyc dosyaları
+*cpython-*.pyc
+
+# Virtualenv klasörleri
 .env
+.env/
 .venv/
-venv/
 env/
-ENV/
-.Python
+venv/
 
-# ---- IDE / Editor ----
+# IDE dosyaları
 .vscode/
 .idea/
-*.sublime-project
-*.sublime-workspace
 
-# ---- Paketleme / Build ----
-build/
-dist/
-*.egg-info/
-.eggs/
-*.manifest
-*.spec
-
-# ---- Test / Coverage ----
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-.pytest_cache/
-nosetests.xml
-coverage.xml
-
-# ---- Jupyter / IPython ----
-.ipynb_checkpoints
-*.ipynb
-
-# ---- Logs & Temporary ----
-*.log
-*.tmp
-*.temp
-*.bak
-*.swp
-*.DS_Store
-Thumbs.db
-
-# ---- Virtualenv & Poetry ----
-poetry.lock
-pip-log.txt
-pip-delete-this-directory.txt
-
-# ---- mypy / pytype / pylint ----
-.mypy_cache/
-.pytype/
-pylint.log
-
-# ---- FastAPI / Uvicorn ----
-*.sqlite3
-*.db
-*.pid
-
-# ---- Docker ----
-*.tar
-*.bak
-docker-compose.override.yml
-
-# ---- Local Config ----
-config/local_*.yml
-config/secrets.yml
-secret_*.json
-
-# ---- VSCode Workspace Backup ----
-.history/
+# MacOS
+.DS_Store

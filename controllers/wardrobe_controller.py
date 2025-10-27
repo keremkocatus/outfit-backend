@@ -4,6 +4,7 @@ from core import config
 import core.routes as routes
 from registery.registery import get_job_status
 from services.error_service import prediction_failed
+from services.token_service import check_token
 from services.wardrobe_service import handle_enhance_webhook, handle_rembg_webhook, process_wardrobe_image
 
 wardrobe_router = APIRouter()
@@ -24,6 +25,9 @@ async def wardrobe_process(
        Aksi halde direkt rembg.
     """
     try:
+        if not await check_token(user_id=user_id, required_token_count=1):
+            return {"status": "failed", "detail": "Token not enough."}
+        
         job_ids = []
 
         # UploadFile listesi üzerinden dön
@@ -94,7 +98,7 @@ async def replicate_fast_webhook(request: Request):
 @wardrobe_router.get(routes.WARDROBE_JOB_STATUS)
 async def fetch_job_status(job_id: str):
     try:
-        return get_job_status(job_id, ["enhance_status", "rembg_status", "caption_status"], "removed_bg_image_url")
+        return await get_job_status(job_id, ["enhance_status", "rembg_status", "caption_status"], "removed_bg_image_url")
     except HTTPException:
         raise
     except Exception as e:

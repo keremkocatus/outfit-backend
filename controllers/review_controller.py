@@ -2,6 +2,7 @@ from fastapi import APIRouter, File, Form, UploadFile, HTTPException
 import core.routes as routes
 from registery.registery import get_job_status
 from services.review_service import process_review_image
+from services.token_service import check_token
 
 review_router = APIRouter()
 
@@ -12,10 +13,13 @@ async def review_process(
     roast_level: str = Form(...)
 ):
     try:
+        if not await check_token(user_id=user_id, required_token_count=1):
+            return {"status": "failed", "detail": "Token not enough."}
+        
         job_id = await process_review_image(
             user_id=user_id,
             image=image,
-            roast_level=roast_level
+            roast_level= roast_level
         )
 
         return {"job_id": job_id}
@@ -28,7 +32,7 @@ async def review_process(
 @review_router.get(routes.REVIEW_JOB_STATUS)
 async def fetch_job_status(job_id: str):
     try:
-        return get_job_status(job_id, ["status"], "result")
+        return await get_job_status(job_id, ["status"], "result")
     except HTTPException:
         raise
     except Exception as e:
