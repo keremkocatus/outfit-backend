@@ -4,6 +4,7 @@ import core.routes as routes
 from registery.registery import get_job_status
 from services.edit_service import process_edit_image, handle_edit_webhook
 from services.error_service import prediction_failed
+from services.token_service import check_token
 
 edit_router = APIRouter()
 
@@ -14,6 +15,9 @@ async def edit_process(
     prompt: str = Form(...)
 ):
     try:
+        if not await check_token(user_id=user_id, required_token_count=1):
+            return {"status": "failed", "detail": "Token not enough."}
+        
         job_id = await process_edit_image(
             user_id=user_id,
             image=image,
@@ -53,7 +57,7 @@ async def replicate_edit_webhook(request: Request):
 @edit_router.get(routes.EDIT_JOB_STATUS)
 async def fetch_job_status(job_id: str):
     try:
-        return get_job_status(job_id, ["status"], "edited_image_url")
+        return await get_job_status(job_id, ["status"], "edited_image_url")
     except HTTPException:
         raise
     except Exception as e:

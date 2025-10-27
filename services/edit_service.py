@@ -8,7 +8,7 @@ from registery.registery import get_job_by_prediction_id, register_job
 from models.registery_models import create_edit_record
 from services.background_service import start_background_process
 from services.replicate_service import trigger_prediction
-from services.error_service import mark_job_failed   
+from services.error_service import mark_job_failed 
 
 
 # Wardrobe enhance and rembg process

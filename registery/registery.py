@@ -1,6 +1,8 @@
 import uuid
 from fastapi import HTTPException
 
+from services.token_service import update_token
+
 JOB_REGISTRY: dict[str, dict] = {}
 
 # Register a new background-removal job and return its identifier
@@ -36,7 +38,7 @@ def update_registry(job_id: str, key: str, new_value):
 
     job[key] = new_value
 
-def get_job_status(job_id: str, status_names: list[str], result_key: str):
+async def get_job_status(job_id: str, status_names: list[str], result_key: str):
     job = JOB_REGISTRY.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail=f"Job_id: {job_id} bulunamadı")
@@ -44,12 +46,15 @@ def get_job_status(job_id: str, status_names: list[str], result_key: str):
     # Job bitti mi? (Tüm status alanları "finished" mi?)
     if all(job.get(status) == "finished" for status in status_names):
         result_url = job.get(result_key)
+        new_token_balance = await update_token(user_id=job.get("user_id"), change_amt=-1)
+        
         del JOB_REGISTRY[job_id]
 
         return {
             "job_id": job_id,
             "status": "finished",
             "result_url": result_url,
+            "token_balance": new_token_balance
         }
 
     # Job fail oldu mu? (Herhangi bir status alanı "failed" ise)
