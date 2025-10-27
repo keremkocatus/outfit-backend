@@ -40,3 +40,5 @@ REVIEW_BUCKET = "review"
 
 TRY_ON_BUCKET = "try-on-images"
 TRY_ON_TABLE = table_name("ai_try_ons", SCHEMA)
+
+VECTOR_STORE = "comm_vector_store"

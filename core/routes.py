@@ -15,9 +15,12 @@ REVIEW_JOB_STATUS = "/review/job-status/{job_id}"
 TRY_ON = "/fashn/try-on"
 TRY_ON_JOB_STATUS = "/fashn/job-status/{job_id}"
 
+OUTFIT_PROCESS = "/outfit/process"
+
 # Webhooks
 WEBHOOK_FAST_REMBG = "/webhook/replicate/fast-rembg"
 WEBHOOK_ENHANCE = "/webhook/replicate-enhance"
 WEBHOOK_LATE_ENHANCE = "/webhook/late-enhance"
 WEBHOOK_IMAGE_EDIT = "/webhook/image-edit"
 WEBHOOK_TRY_ON = "/webhook/fashn/tryon"
+WEBHOOK_OUTFIT = "/webhook/outfit-insert"
