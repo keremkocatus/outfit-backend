@@ -10,12 +10,11 @@ from services.background_service import start_background_process
 from services.fashn_service import trigger_fashn
 from services.error_service import mark_job_failed, prediction_failed   
 
-
 # Try-on process
 async def process_tryon(
     user_id: str,
     model_image: UploadFile,
-    garment_image: None,
+    garment_image: UploadFile | str,
     category: str,
     is_long_top: str
 ):
@@ -25,7 +24,7 @@ async def process_tryon(
 
         model_url, bucket_id = await upload_image(user_id, bucket, None, "model.jpg", model_image)
 
-        if garment_image is str:
+        if isinstance(garment_image, str):
             job = create_tryon_record(model_url, garment_image, user_id, category, is_long_top, bucket_id)
         else:
             garment_url, _ = await upload_image(user_id, bucket, bucket_id, "garment.jpg", garment_image)
