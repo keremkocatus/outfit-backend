@@ -4,7 +4,7 @@ from core import config, routes
 from db.insert import insert_job_record
 from db.upload_image import upload_image
 from models.prediction_models import build_edit_prediction_input
-from registery.registery import get_job_by_prediction_id, register_job
+from registery.registery import get_job_by_id, get_job_by_prediction_id, register_job
 from models.registery_models import create_edit_record
 from services.background_service import start_background_process
 from services.replicate_service import trigger_prediction
@@ -72,6 +72,8 @@ async def handle_edit_webhook(payload: dict) -> None:
             job_id, job = await get_job_by_prediction_id(prediction_id, "prediction_id")
 
             await start_background_process(payload, job_id, job, "edited.jpg", "status", "edited_image_url", "finished", config.EDIT_BUCKET_NAME ,config.EDIT_TABLE_NAME)
+
+            job = await get_job_by_id(job_id)
 
             return job_id, job
         else:

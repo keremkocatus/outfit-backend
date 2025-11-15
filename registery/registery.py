@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from redisdb.connection import redis_client
 from redisdb.index import create_indexes, delete_indexes, get_id_from_index
 from redisdb.update import update_record_field
+from redisdb.base_ops import hset_dict, hgetall
 from services.token_service import update_token
 
 TTL = 1800
@@ -17,14 +18,13 @@ INDEX_KEYS = [
 async def register_job(job_record: dict) -> str:
     job_id = str(uuid.uuid4())
 
-    await redis_client.hset(f"job:{job_id}", mapping=job_record)
+    await hset_dict(f"job:{job_id}", job_record, TTL)
     await create_indexes("job", job_id, job_record, INDEX_KEYS, TTL)
-    await redis_client.expire(f"job:{job_id}", TTL)
 
     return job_id
 
 async def get_job_by_id(job_id):
-    return await redis_client.hgetall(f"job:{job_id}")
+    return await hgetall(f"job:{job_id}")
 
 async def get_job_by_prediction_id(prediction_id: str, prediction_name: str) -> tuple[str, dict]:
     job_id = await get_id_from_index("job", prediction_name, prediction_id)
@@ -32,7 +32,7 @@ async def get_job_by_prediction_id(prediction_id: str, prediction_name: str) -> 
     if not job_id:
         raise ValueError(f"No job found with prediction ID: {prediction_id}")
     
-    job = await redis_client.hgetall(f"job:{job_id}")
+    job = await hgetall(f"job:{job_id}")
 
     if not job:
         raise ValueError(f"Job record missing for prediction ID: {prediction_id}")
@@ -41,11 +41,13 @@ async def get_job_by_prediction_id(prediction_id: str, prediction_name: str) -> 
 
 
 async def update_registry(job_id: str, key: str, new_value):
-    await update_record_field("job", job_id, key, new_value, INDEX_KEYS, TTL)
-
+    try:
+        await update_record_field("job", job_id, key, new_value, INDEX_KEYS, TTL)
+    except Exception as e:
+        raise 
 
 async def get_job_status(job_id: str, status_names: list[str], result_key: str):
-    job = await redis_client.hgetall(f"job:{job_id}")
+    job = await hgetall(f"job:{job_id}")
     if not job:
         raise HTTPException(status_code=404, detail=f"Job_id: {job_id} bulunamadı")
 
@@ -55,7 +57,7 @@ async def get_job_status(job_id: str, status_names: list[str], result_key: str):
         new_token_balance = await update_token(user_id=job.get("user_id"), change_amt=-1)
 
         await redis_client.delete(f"job:{job_id}")
-        await delete_indexes("job", job_id, job, INDEX_KEYS)
+        await delete_indexes("job", job, INDEX_KEYS)
 
         return {
             "job_id": job_id,
@@ -68,7 +70,7 @@ async def get_job_status(job_id: str, status_names: list[str], result_key: str):
     if any(job.get(status) == "failed" for status in status_names):
         
         await redis_client.delete(f"job:{job_id}")
-        await delete_indexes("job", job_id, job, INDEX_KEYS)
+        await delete_indexes("job", job, INDEX_KEYS)
 
         return {
             "job_id": job_id,

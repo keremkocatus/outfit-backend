@@ -4,7 +4,7 @@ from core import config, routes
 from db.insert import insert_job_record
 from db.upload_image import upload_image
 from models.prediction_models import build_enhance_prediction_input, build_rembg_prediction_input
-from registery.registery import get_job_by_prediction_id, register_job, update_registry
+from registery.registery import get_job_by_id, get_job_by_prediction_id, register_job, update_registry
 from models.registery_models import create_wardrobe_record
 from services.background_service import start_background_process
 from services.caption_service import process_caption_for_job
@@ -103,9 +103,11 @@ async def handle_enhance_webhook(payload: dict) -> None:
                 table_name=config.WARDROBE_TABLE_NAME
             )
 
+            job = await get_job_by_id(job_id)
+
             loop = asyncio.get_running_loop()
             # Start Caption
-            loop.create_task(process_caption_for_job(job))
+            loop.create_task(process_caption_for_job(job_id, job))
             
             # Start Rembg
             loop.create_task(trigger_prediction(
