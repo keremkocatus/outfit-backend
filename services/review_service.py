@@ -25,7 +25,7 @@ async def process_review_image(
 
         # Job kaydı
         job = create_review_record(public_url, user_id, bucket_id, roast_level)
-        job_id = register_job(job)
+        job_id = await register_job(job)
 
         # DB'ye başlangıç kaydını ekle
         resp = await insert_job_record(
@@ -66,7 +66,7 @@ async def start_review_generation(
     try:
         review_result = await generate_review(image_url, roast_level)
         
-        job = get_job_by_id(job_id)
+        job = await get_job_by_id(job_id)
         
         # DB güncelle
         update_data = {
@@ -81,8 +81,8 @@ async def start_review_generation(
         )
         
         # registry güncelle
-        update_registry(job_id, "status", "finished")
-        update_registry(job_id, "result", review_result)
+        await update_registry(job_id, "status", "finished")
+        await update_registry(job_id, "result", review_result)
 
         return {"status": 200, "response": resp}
     except Exception as e:

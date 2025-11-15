@@ -26,7 +26,7 @@ async def process_edit_image(
 
         # Job kaydı
         job = create_edit_record(public_url, user_id, bucket_id, prompt)
-        job_id = register_job(job)
+        job_id = await register_job(job)
 
         # DB'ye başlangıç kaydını ekle
         resp = await insert_job_record(
@@ -69,14 +69,14 @@ async def handle_edit_webhook(payload: dict) -> None:
 
         if status == "succeeded":
             prediction_id = payload.get("id")
-            job_id, job = get_job_by_prediction_id(prediction_id, "prediction_id")
+            job_id, job = await get_job_by_prediction_id(prediction_id, "prediction_id")
 
             await start_background_process(payload, job_id, job, "edited.jpg", "status", "edited_image_url", "finished", config.EDIT_BUCKET_NAME ,config.EDIT_TABLE_NAME)
 
             return job_id, job
         else:
             prediction_id = payload.get("id")
-            job_id, _ = get_job_by_prediction_id(prediction_id, "prediction_id")
+            job_id, _ = await get_job_by_prediction_id(prediction_id, "prediction_id")
 
             if job_id:
                 await mark_job_failed(job_id, config.EDIT_TABLE_NAME, ["status"])

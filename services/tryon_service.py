@@ -31,7 +31,7 @@ async def process_tryon(
             job = create_tryon_record(model_url, garment_url, user_id, category, is_long_top, bucket_id)
         
         # Job kaydı
-        job_id = register_job(job)
+        job_id = await register_job(job)
 
         # DB'ye başlangıç kaydını ekle
         resp = await insert_job_record(
@@ -68,7 +68,7 @@ async def handle_tryon_webhook(payload: dict) -> None:
 
         if status == "completed":
             prediction_id = payload.get("id")
-            job_id, job = get_job_by_prediction_id(prediction_id, "ai_job_id")
+            job_id, job = await get_job_by_prediction_id(prediction_id, "ai_job_id")
 
             await start_background_process(payload, job_id, job, "try-on.jpg", "status", "result_url", "finished", config.TRY_ON_BUCKET ,config.TRY_ON_TABLE)
 

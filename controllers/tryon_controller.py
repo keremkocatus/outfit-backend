@@ -1,6 +1,5 @@
 from typing import Optional
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
-from core import config
 import core.routes as routes
 from registery.registery import get_job_status
 from services.token_service import check_token

@@ -30,7 +30,7 @@ async def process_wardrobe_image(
 
         # Job kaydı
         job = create_wardrobe_record(public_url, user_id, bucket_id, category, is_long_top)
-        job_id = register_job(job)
+        job_id = await register_job(job)
 
         # DB'ye başlangıç kaydını ekle
         resp = await insert_job_record(
@@ -46,7 +46,7 @@ async def process_wardrobe_image(
                 "rembg_status"
             ])
         
-        update_registry(job_id, "wardrobe_item_id", extract_id(resp["response"].data))
+        await update_registry(job_id, "wardrobe_item_id", extract_id(resp["response"].data))
 
         # Enhance veya Rembg tetikleme
         loop = asyncio.get_running_loop()
@@ -60,7 +60,7 @@ async def process_wardrobe_image(
             ))
         else:
             # Start Caption
-            loop.create_task(process_caption_for_job(job))
+            loop.create_task(process_caption_for_job(job_id, job))
 
             # Start Rembg
             loop.create_task(trigger_prediction(
@@ -91,7 +91,7 @@ async def handle_enhance_webhook(payload: dict) -> None:
 
         if status == "succeeded":
             prediction_id = payload.get("id")
-            job_id, job = get_job_by_prediction_id(prediction_id, "enhance_prediction_id")
+            job_id, job = await get_job_by_prediction_id(prediction_id, "enhance_prediction_id")
 
             await start_background_process(
                 payload, job_id, job,
@@ -119,7 +119,7 @@ async def handle_enhance_webhook(payload: dict) -> None:
             return job_id, job
         else:
             prediction_id = payload.get("id")
-            job_id, _ = get_job_by_prediction_id(prediction_id, "enhance_prediction_id")
+            job_id, _ = await get_job_by_prediction_id(prediction_id, "enhance_prediction_id")
             if job_id:
                 await mark_job_failed(job_id, config.WARDROBE_TABLE_NAME, ["enhance_status"])
     except Exception as e:
@@ -133,7 +133,7 @@ async def handle_rembg_webhook(payload: dict):
     job_id = None
     try:
         prediction_id = payload["id"]
-        job_id, job = get_job_by_prediction_id(prediction_id, "rembg_prediction_id")
+        job_id, job = await get_job_by_prediction_id(prediction_id, "rembg_prediction_id")
 
         loop = asyncio.get_running_loop()
         loop.create_task(start_background_process(
