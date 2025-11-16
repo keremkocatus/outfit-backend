@@ -46,7 +46,7 @@ async def update_registry(job_id: str, key: str, new_value):
     except Exception as e:
         raise 
 
-async def get_job_status(job_id: str, status_names: list[str], result_key: str):
+async def get_job_status(job_id: str, status_names: list[str], result_key: str, token_change_amt: int = -1):
     job = await hgetall(f"job:{job_id}")
     if not job:
         raise HTTPException(status_code=404, detail=f"Job_id: {job_id} bulunamadı")
@@ -54,7 +54,7 @@ async def get_job_status(job_id: str, status_names: list[str], result_key: str):
     # Job bitti mi? (Tüm status alanları "finished" mi?)
     if all(job.get(status) == "finished" for status in status_names):
         result_url = job.get(result_key)
-        new_token_balance = await update_token(user_id=job.get("user_id"), change_amt=-1)
+        new_token_balance = await update_token(user_id=job.get("user_id"), change_amt=token_change_amt)
 
         await redis_client.delete(f"job:{job_id}")
         await delete_indexes("job", job, INDEX_KEYS)
