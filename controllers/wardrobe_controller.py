@@ -25,12 +25,13 @@ async def wardrobe_process(
        Aksi halde direkt rembg.
     """
     try:
+        '''
         if not await check_token(user_id=user_id, required_token_count=1):
             raise HTTPException(
                 status_code=402,
                 detail={"Token not enough."}
             )
-        
+        '''
         job_ids = []
 
         # UploadFile listesi üzerinden dön
@@ -101,7 +102,7 @@ async def replicate_fast_webhook(request: Request):
 @wardrobe_router.get(routes.WARDROBE_JOB_STATUS)
 async def fetch_job_status(job_id: str):
     try:
-        return await get_job_status(job_id, ["enhance_status", "rembg_status", "caption_status"], "removed_bg_image_url")
+        return await get_job_status(job_id, ["enhance_status", "rembg_status", "caption_status"], "removed_bg_image_url", 0)
     except HTTPException:
         raise
     except Exception as e:

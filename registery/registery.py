@@ -38,7 +38,7 @@ def update_registry(job_id: str, key: str, new_value):
 
     job[key] = new_value
 
-async def get_job_status(job_id: str, status_names: list[str], result_key: str):
+async def get_job_status(job_id: str, status_names: list[str], result_key: str, change_amt: int = -1):
     job = JOB_REGISTRY.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail=f"Job_id: {job_id} bulunamadı")
@@ -46,7 +46,7 @@ async def get_job_status(job_id: str, status_names: list[str], result_key: str):
     # Job bitti mi? (Tüm status alanları "finished" mi?)
     if all(job.get(status) == "finished" for status in status_names):
         result_url = job.get(result_key)
-        new_token_balance = await update_token(user_id=job.get("user_id"), change_amt=-1)
+        new_token_balance = await update_token(user_id=job.get("user_id"), change_amt=change_amt)
         
         del JOB_REGISTRY[job_id]
 
