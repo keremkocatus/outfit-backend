@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import APIRouter, File, Form, Request, UploadFile, HTTPException
-from core import config
+from core import config, rule_engine
 import core.routes as routes
 from registery.registery import get_job_status
 from services.error_service import prediction_failed
@@ -25,7 +25,7 @@ async def wardrobe_process(
        Aksi halde direkt rembg.
     """
     try:
-        if not await check_token(user_id=user_id, required_token_count=1):
+        if not await check_token(user_id=user_id, required_token_count=rule_engine.WARDROBE_REQUIRED_TOKEN):
             raise HTTPException(
                 status_code=402,
                 detail={"Token not enough."}
@@ -101,7 +101,7 @@ async def replicate_fast_webhook(request: Request):
 @wardrobe_router.get(routes.WARDROBE_JOB_STATUS)
 async def fetch_job_status(job_id: str):
     try:
-        return await get_job_status(job_id, ["enhance_status", "rembg_status", "caption_status"], "removed_bg_image_url")
+        return await get_job_status(job_id, ["enhance_status", "rembg_status", "caption_status"], "removed_bg_image_url", rule_engine.WARDROBE_TOKEN_CHNG_AMT)
     except HTTPException:
         raise
     except Exception as e:

@@ -1,7 +1,6 @@
 from typing import Optional
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
-from core import config
-import core.routes as routes
+from core import routes, rule_engine
 from registery.registery import get_job_status
 from services.token_service import check_token
 from services.tryon_service import handle_tryon_webhook, process_tryon
@@ -18,7 +17,7 @@ async def try_on_process(
     is_long_top: str = Form(...)                       # mevcut tipini bozmadım
 ):
     try:
-        if not await check_token(user_id=user_id, required_token_count=1):
+        if not await check_token(user_id=user_id, required_token_count=rule_engine.TRYON_REQUIRED_TOKEN):
             raise HTTPException(
                 status_code=402,
                 detail={"Token not enough."}
@@ -56,7 +55,7 @@ async def replicate_enhance_webhook(request: Request):
 @try_on_router.get(routes.TRY_ON_JOB_STATUS)
 async def fetch_job_status(job_id: str):
     try:
-        return await get_job_status(job_id, ["status"], "result_url")
+        return await get_job_status(job_id, ["status"], "result_url", rule_engine.TRYON_TOKEN_CHNG_AMT)
     except HTTPException:
         raise
     except Exception as e:

@@ -47,8 +47,8 @@ async def start_background_process(
         )
         
         # registry güncelle
-        update_registry(job_id, status_field, status_value)
-        update_registry(job_id, url_field, result_url)
+        await update_registry(job_id, status_field, status_value)
+        await update_registry(job_id, url_field, result_url)
 
         return {"status": 200, "response": resp}
 
