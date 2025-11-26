@@ -1,6 +1,5 @@
 from fastapi import APIRouter, File, Form, Request, UploadFile, HTTPException
-from core import config
-import core.routes as routes
+from core import config, routes, rule_engine
 from registery.registery import get_job_status
 from services.edit_service import process_edit_image, handle_edit_webhook
 from services.error_service import prediction_failed
@@ -15,7 +14,7 @@ async def edit_process(
     prompt: str = Form(...)
 ):
     try:
-        if not await check_token(user_id=user_id, required_token_count=1):
+        if not await check_token(user_id=user_id, required_token_count=rule_engine.EDIT_REQUIRED_TOKEN):
             raise HTTPException(
                 status_code=402,
                 detail={"Token not enough."}
@@ -60,7 +59,7 @@ async def replicate_edit_webhook(request: Request):
 @edit_router.get(routes.EDIT_JOB_STATUS)
 async def fetch_job_status(job_id: str):
     try:
-        return await get_job_status(job_id, ["status"], "edited_image_url")
+        return await get_job_status(job_id, ["status"], "edited_image_url", rule_engine.EDIT_TOKEN_CHNG_AMT)
     except HTTPException:
         raise
     except Exception as e:

@@ -20,7 +20,7 @@ async def trigger_fashn(job_id: str, input_json: dict, fashn_url: str, predictio
         data = response.json()
 
         # Prediction başarılı, registry güncelle
-        update_registry(job_id, prediction_id_name, data.get("id"))
+        await update_registry(job_id, prediction_id_name, data.get("id"))
         await update_in_db(config.TRY_ON_TABLE, {"ai_job_id": data.get("id")}, "job_id", job_id)
 
     except Exception as e:

@@ -20,6 +20,7 @@ def create_wardrobe_record(
         "is_long_top": is_long_top,
         "removed_bg_image_url": None,
         "enhanced_image_url": None,
+        "timeout_counter": 0
     }
 
     return record
@@ -38,6 +39,7 @@ def create_edit_record(
         "image_url": image_url,
         "prompt": prompt,
         "edited_image_url": None,
+        "timeout_counter": 0
     }
 
     return record
@@ -56,6 +58,7 @@ def create_review_record(
         "image_url": image_url,
         "roast_level": roast_level,
         "result": None,
+        "timeout_counter": 0
     }
 
     return record
@@ -77,7 +80,8 @@ def create_tryon_record(
         "clothing_url": garment_image,
         "clothing_type": category,
         "is_long_top": is_long_top,
-        "result_url": None
+        "result_url": None,
+        "timeout_counter": 0
     }
 
     return record

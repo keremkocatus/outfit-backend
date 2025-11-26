@@ -19,7 +19,7 @@ async def insert_job_record(job_id: str, table_name: str, insert_keys: list[str]
     """
     try:
         supabase = await get_supabase_client()
-        job = get_job_by_id(job_id)
+        job = await get_job_by_id(job_id)
 
         # sadece parametre olarak verilen keyleri al
         insert_data = {key: job.get(key) for key in insert_keys}
