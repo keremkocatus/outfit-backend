@@ -30,7 +30,7 @@ async def wardrobe_process(
                 status_code=402,
                 detail={"Token not enough."}
             )
-        '''
+            
         job_ids = []
 
         # UploadFile listesi üzerinden dön
