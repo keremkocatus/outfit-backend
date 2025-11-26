@@ -50,7 +50,16 @@ async def get_job_status(job_id: str, status_names: list[str], result_key: str, 
     job = await hgetall(f"job:{job_id}")
     if not job:
         raise HTTPException(status_code=404, detail=f"Job_id: {job_id} bulunamadı")
-
+    
+    timeout_counter = job.get("timeout_counter")
+    if timeout_counter == 15:
+        return {
+            "job_id": job_id,
+            "status": "failed",
+        }
+    else:
+        await update_record_field("job", job_id, "timeout_counter", timeout_counter+1)
+        
     # Job bitti mi? (Tüm status alanları "finished" mi?)
     if all(job.get(status) == "finished" for status in status_names):
         result_url = job.get(result_key)

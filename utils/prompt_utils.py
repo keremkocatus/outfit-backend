@@ -19,3 +19,27 @@ def get_enhance_prompt(category: str) -> str:
 
     else:
         return "Extract the clothing item from the image without changing its shape or size. Preserve the clothing exactly as it is. Remove background and human body parts."
+
+
+def get_tryon_input(category: str) -> str:
+    return f"""
+        Generate a photorealistic virtual try-on result.
+
+        The first input image is the **model image**, which must remain exactly the same person:
+        - Keep the model's identity, face, pose, body shape, skin tone, and background unchanged.
+
+        The second input image is the **garment image**, containing the clothing item(s) that must be applied onto the model.
+
+        Garment Transfer Rules:
+        - Garment category: {category}
+        - If 'tops': replace ONLY the upper-body clothing.
+        - If 'bottoms': replace ONLY the pants/skirts/shorts.
+        - If 'one-pieces': replace the full-body garment appropriately.
+        - Preserve all garment attributes: texture, colors, patterns, logos, stitching, fabric behavior, and shape.
+        - Ensure realistic physics: natural draping, correct alignment, shadows, wrinkles, and body interaction.
+        - The output must look like a real photograph with consistent lighting and perspective.
+        - Do NOT change the model’s appearance except for the clothing replacement.
+
+        Output:
+        A highly realistic image of the model wearing the garment(s) exactly as shown in the garment image.
+        """

@@ -9,7 +9,7 @@ async def update_record_field(
     record_id: str,
     field: str,
     new_value,
-    index_keys: list[str],
+    index_keys: list[str] = [],
     ttl: int = 1800
 ):
     redis_key = f"{namespace}:{record_id}"

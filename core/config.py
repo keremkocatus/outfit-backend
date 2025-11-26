@@ -26,6 +26,7 @@ REMBG_MODEL_ID = "a029dff38972b5fda4ec5d75d7d1cd25aeff621d2cf4946a41055d7db66b80
 ENHANCE_MODEL_ID = "google/nano-banana"
 EDIT_MODEL_ID = "google/nano-banana"
 TRY_ON_MODEL_ID = "tryon-v1.6"
+TRY_ON_BANANA_ID = "google/nano-banana"
 
 # Tables & Buckets
 SCHEMA = os.getenv("SCHEMA")
