@@ -1,33 +1,33 @@
+import json
 from redisdb.connection import redis_client
-from redisdb.utils import restore_record, sanitize_value
 
 
-async def hset_dict(key: str, record: dict, ttl: int):
+async def set_dict(key: str, record: dict, ttl: int):
     """
-    mapping kullanmadan, dict'i güvenli bir şekilde Redis'e HSET eden generic fonksiyon.
-
-    Tüm değerler tek tek yazılır -> Redis asyncio sürümlerinde garanti çalışır.
-    None değerler otomatik sanitize edilir.
+    Dict'i JSON string olarak Redis'e SETEX ile yazar.
+    None/bool/dict/list gibi tüm tipler JSON içinde güvenle taşınır.
     """
-    for field, value in record.items():
-        sanitized = sanitize_value(value)
-        await redis_client.hset(key, field, sanitized)
-    
-    await redis_client.expire(key, ttl)
+    try:
+        json_str = json.dumps(record, ensure_ascii=False)
+    except Exception as e:
+        raise ValueError(f"Record JSON'a dönüştürülemedi: {e}")
+
+    await redis_client.setex(key, ttl, json_str)
 
 
-async def hgetall(key: str) -> dict:
+
+async def get_dict(key: str) -> dict:
     """
-    Redis hgetall yapar ve dönen değeri restore ederek gerçek Python tiplerine çevirir.
-
-    Örn:
-    "null"  -> None
-    "true"  -> True
-    "false" -> False
+    Redis GET → JSON parse → dict olarak döner.
+    Key yoksa boş dict döner.
     """
-    raw = await redis_client.hgetall(key)
+    data = await redis_client.get(key)
 
-    if not raw:
+    if not data:
         return {}
 
-    return restore_record(raw)
+    try:
+        return json.loads(data)
+    except Exception:
+        # Bozuk JSON varsa ham veri döndür
+        return {"raw": data}
