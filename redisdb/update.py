@@ -1,8 +1,5 @@
-from redisdb.connection import redis_client
 from redisdb.index import create_indexes, delete_indexes
-from redisdb.base_ops import hgetall
-from redisdb.utils import sanitize_value
-
+from redisdb.base_ops import get_dict, set_dict
 
 async def update_record_field(
     namespace: str,
@@ -14,25 +11,24 @@ async def update_record_field(
 ):
     redis_key = f"{namespace}:{record_id}"
 
-    # 1) Eski record'ı komple çek (restore edilmiş)
-    old_job = await hgetall(redis_key)
+    # 1) Eski kayıt
+    record = await get_dict(redis_key)
 
-    if field not in old_job:
+    if field not in record:
         raise ValueError(f"Field '{field}' does not exist in record '{record_id}'")
 
-    # 2) Eski index’i sil (ama sadece indexable ise)
+    # 2) Index sil (field indexable ise)
     if field in index_keys:
-        await delete_indexes(namespace, old_job, index_keys=[field])
+        await delete_indexes(namespace, record, [field])
 
-    # 3) Yeni değeri sanitize edip yaz
-    sanitized = sanitize_value(new_value)
-    await redis_client.hset(redis_key, field, sanitized)
+    # 3) Kayıt dict içinde güncelle
+    record[field] = new_value  
 
-    # 4) Yeni index oluştur (indexable ise)
-    new_record = {field: sanitized}
+    # 4) JSON SETEX ile komple yeniden yaz
+    await set_dict(redis_key, record, ttl)
+
+    # 5) Yeni index oluştur
     if field in index_keys:
-        await create_indexes(namespace, record_id, new_record, [field], ttl)
+        await create_indexes(namespace, record_id, record, [field], ttl)
 
-    # 5) TTL yenile
-    if ttl:
-        await redis_client.expire(redis_key, ttl)
+    return record
