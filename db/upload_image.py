@@ -21,7 +21,7 @@ async def upload_image(user_id: str, bucket: str, bucket_id: str | None, file_na
         await supabase.storage.from_(bucket).upload(
             path=storage_path,
             file=image_data,
-            file_options={"cache-control": "3600", "upsert": "false"},
+            file_options={"cache-control": "3600", "upsert": "true"},
         )
 
         public_url_response = await supabase.storage.from_(bucket).get_public_url(storage_path)

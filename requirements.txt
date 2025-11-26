@@ -9,6 +9,4 @@ python-multipart
 supabase
 openai
 numpy
-tensorflow
-keras
-scikit-learn
+redis

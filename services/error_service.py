@@ -21,13 +21,13 @@ async def mark_job_failed(
 
     # Registry de güncelle
     for field in failed_fields:
-        update_registry(job_id, field, "failed")
+        await update_registry(job_id, field, "failed")
 
     # Supabase tablosunda update et
     resp = await update_in_db(table_name, update_data, "job_id", job_id)
 
 async def prediction_failed(payload: dict, table_name: str, prediction_id_name: str, failed_fileds: list[str]):
     prediction_id = payload.get("id")
-    job_id, _ = get_job_by_prediction_id(prediction_id, prediction_id_name)
+    job_id, _ = await get_job_by_prediction_id(prediction_id, prediction_id_name)
 
     await mark_job_failed(job_id, table_name, failed_fileds)

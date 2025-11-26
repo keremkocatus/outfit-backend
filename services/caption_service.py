@@ -1,11 +1,11 @@
 from core import config
 from db.insert import insert_to_db
 from db.update import update_in_db
-from registery.registery import get_job_id_by_job, update_registry
+from registery.registery import update_registry
 from services.openai.generate_caption import generate_structured_caption
 from utils.caption_tools.hex_utils import convert_colors_to_hex_format
 
-async def process_caption_for_job(job: dict) -> dict | str:
+async def process_caption_for_job(job_id: str, job: dict) -> dict | str:
     """
     Generates an AI-based outfit caption for the given job,
     stores it in Supabase and updates related registries.
@@ -28,9 +28,7 @@ async def process_caption_for_job(job: dict) -> dict | str:
             caption_data=caption_data
         )
 
-        # 3. Update registry
-        job_id = get_job_id_by_job(job)
-        update_registry(job_id, "caption_status", "finished")
+        await update_registry(job_id, "caption_status", "finished")
 
         # 4. Update Supabase wardrobe entry
         updated_data = {"caption": caption_data["ai_context"],
