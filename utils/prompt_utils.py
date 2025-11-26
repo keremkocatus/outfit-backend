@@ -34,7 +34,7 @@ def get_tryon_input(category: str) -> str:
         - Garment category: {category}
         - If 'tops': replace ONLY the upper-body clothing.
         - If 'bottoms': replace ONLY the pants/skirts/shorts.
-        - If 'one-pieces': replace the full-body garment appropriately.
+        - If 'one-pieces': replace the full-body garment(dress or a full outfit combine) appropriately.
         - Preserve all garment attributes: texture, colors, patterns, logos, stitching, fabric behavior, and shape.
         - Ensure realistic physics: natural draping, correct alignment, shadows, wrinkles, and body interaction.
         - The output must look like a real photograph with consistent lighting and perspective.
