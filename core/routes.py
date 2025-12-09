@@ -17,6 +17,8 @@ TRY_ON_JOB_STATUS = "/fashn/job-status/{job_id}"
 
 OUTFIT_PROCESS = "/outfit/process"
 
+NOTIFICATION_PUSH_TOKEN = "/notification/save/push-token"
+
 # Webhooks
 WEBHOOK_FAST_REMBG = "/webhook/replicate/fast-rembg"
 WEBHOOK_ENHANCE = "/webhook/replicate-enhance"
